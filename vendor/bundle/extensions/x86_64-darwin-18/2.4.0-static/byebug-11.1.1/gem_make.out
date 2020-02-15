@@ -1,0 +1,19 @@
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/byebug-11.1.1/ext/byebug
+/Users/mizukamisatoru/.rbenv/versions/2.4.1/bin/ruby -r ./siteconf20200214-44922-3z08wo.rb extconf.rb
+creating Makefile
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/byebug-11.1.1/ext/byebug
+make "DESTDIR=" clean
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/byebug-11.1.1/ext/byebug
+make "DESTDIR="
+compiling breakpoint.c
+compiling byebug.c
+compiling context.c
+compiling locker.c
+compiling threads.c
+linking shared-object byebug/byebug.bundle
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/byebug-11.1.1/ext/byebug
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 byebug.bundle ./.gem.20200214-44922-cr4ng4/byebug

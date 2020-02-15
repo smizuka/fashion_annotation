@@ -1,0 +1,15 @@
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/bootsnap-1.4.5/ext/bootsnap
+/Users/mizukamisatoru/.rbenv/versions/2.4.1/bin/ruby -r ./siteconf20200214-44922-1jfj2xz.rb extconf.rb
+creating Makefile
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/bootsnap-1.4.5/ext/bootsnap
+make "DESTDIR=" clean
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/bootsnap-1.4.5/ext/bootsnap
+make "DESTDIR="
+compiling bootsnap.c
+linking shared-object bootsnap/bootsnap.bundle
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/bootsnap-1.4.5/ext/bootsnap
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 bootsnap.bundle ./.gem.20200214-44922-10j5xxy/bootsnap
