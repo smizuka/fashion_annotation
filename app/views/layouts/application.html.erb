@@ -1,15 +1,58 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>FashionAnnotation</title>
+    <title>BirdAnnotation</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= javascript_include_tag "application" %>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <style>
+    .alert{
+      margin-bottom: 0px;
+      position: fixed;
+      width: 100%;
+      z-index: 10000;
+    }
+    </style>
   </head>
-
   <body>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+
+        <div class="navbar-nav mr-auto">
+                <% if logged_in? %>
+                    <p class="navbar-brand"><%= current_user.name %>さん</p>
+                <% else %>
+                    <a class="navbar-brand " href="#">
+                        ファッションアノテーション
+                    </a>
+                <% end %>
+        </div>
+        <div class="navbar-nav">
+            <% if logged_in? %>
+                <%= link_to("登録情報変更", sessions_updateNew_path, {class: "nav-item nav-link text-white h5"}) %>
+
+                <%= link_to sessions_destroy_path,method: :delete do %>
+                    <p class="nav-item nav-link text-white h5">
+                        ログアウト
+                    </p>
+                <% end %>
+            <% end %>
+        </div>
+    </nav>
+    <% flash.each do |key, value| %>
+      <div class="alert alert-<%= key %>" role="alert"><%= value %></div>
+    <% end %>
+
     <%= yield %>
+    <script>
+      $(function(){
+        $(".alert").fadeOut(5000);
+      });
+    </script>
   </body>
 </html>
+

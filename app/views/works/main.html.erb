@@ -1,0 +1,614 @@
+<style>
+div#header {
+    position: fixed;
+    top: 0;
+    background: #0008;
+    color: white;
+    padding: 1rem;
+    width: 100%;
+}
+div#footer {
+    position: fixed;
+    bottom: 0;
+    background: #0008;
+    color: white;
+    padding: 1rem;
+    width: 100%;
+}
+/*div#contextmenu {
+    position: fixed;
+    left: 0;
+    top: 0;
+    visibility: hidden;
+}*/
+
+</style>
+
+<% if @count!=0 %>
+<div id='vue-wrap'>
+    <app ref='main'>
+        <div class='hoge'></div>
+    </app>
+</div>
+<!-- モーダルの設定 -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title mx-auto" id="staticBackdropLabel">各ボタンの解説</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group mx-auto" style="max-width: 400px;">
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">１つ前に戻る</span> : １つ前の画像に戻る。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">初期位置に戻る</span> : 枠線を初期位置に戻す。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">イヌワシ</span> : イヌワシと判断できる画像。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">オジロワシ</span> : オジロワシと判断できる画像。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">チュウヒ</span> : チュウヒと判断できる画像。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">クマタカ</span> : クマタカと判断できる画像。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">タンチョウ</span> : タンチョウと判断できる画像。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">Bird</span> : 5種類の鳥以外で、鳥類と判断できる画像。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">Non Bird</span> : 鳥類以外の特定の飛翔物体と判断できる画像。航空機など。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">Unknown</span> : 何らかの飛翔体ではあるが正体不明の画像。
+          </li>
+          <li class="list-group-item">
+            <span class="text-primary font-weight-bold">Pass</span> : 飛翔体でもない物体。枠外から連続している画像。木の一部、建物の一部など。
+          </li>
+        </ul>
+      </div>
+<!--       <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<script>
+
+// use string template to use camlecase attribute name
+// see https://github.com/vuejs/vue/issues/4212
+Vue.component('app', {
+    template: `
+        <div>
+            <svg :viewBox='viewBox' :width='svg.w' :height='svg.h'
+                v-on:mouseup='mouseUp'
+                v-on:mousemove='mouseMove'
+                v-on:click='click'
+                v-on:contextmenu='contextMenu'
+                v-on:wheel='wheel'>
+                <image x='0' y='0' :width='image.w' :height='image.h' :href='imagePath' style='pointer-ecents: none;'/>
+                <rect :x='view.x' :y='view.y' :width='view.w' :height='view.h' fill='#0000'
+                    v-on:mouseup='mouseUp'
+                    v-on:mousedown='mouseDown($event, -1)'/>
+                <rect :x='Math.min(rect.sx, rect.tx)'
+                      :y='Math.min(rect.sy, rect.ty)'
+                      v-on:mousedown='mouseDown($event, 0)'
+                      v-on:mouseup='mouseUp'
+                      cursor='move'
+                      :width='Math.abs(rect.tx-rect.sx)'
+                      :height='Math.abs(rect.ty-rect.sy)' stroke='red' fill='#0000'/>
+                <circle
+                    v-on:mousedown='mouseDown($event, 5)'
+                    v-on:mouseup='mouseUp'
+                    cursor='n-resize'
+                    :cx='(rect.sx+rect.tx)/2'
+                    :cy='rect.sy'
+                    r='4'
+                    fill='#0000'/>
+                <circle
+                    v-on:mousedown='mouseDown($event, 6)'
+                    v-on:mouseup='mouseUp'
+                    cursor='e-resize'
+                    :cx='rect.tx'
+                    :cy='(rect.sy+rect.ty)/2'
+                    r='4'
+                    fill='#0000'/>
+                <circle
+                    v-on:mousedown='mouseDown($event, 7)'
+                    v-on:mouseup='mouseUp'
+                    cursor='s-resize'
+                    :cx='(rect.sx+rect.tx)/2'
+                    :cy='rect.ty'
+                    r='4'
+                    fill='#0000'/>
+                <circle
+                    v-on:mousedown='mouseDown($event, 8)'
+                    v-on:mouseup='mouseUp'
+                    cursor='w-resize'
+                    :cx='rect.sx'
+                    :cy='(rect.sy+rect.ty)/2'
+                    r='4'
+                    fill='#0000'/>
+                <circle
+                    v-on:mousedown='mouseDown($event, 1)'
+                    v-on:mouseup='mouseUp'
+                    cursor='nw-resize'
+                    :cx='rect.sx'
+                    :cy='rect.sy'
+                    r='4'
+                    fill='#0000'/>
+                <circle
+                    v-on:mousedown='mouseDown($event, 2)'
+                    v-on:mouseup='mouseUp'
+                    cursor='se-resize'
+                    :cx='rect.tx'
+                    :cy='rect.ty'
+                    r='4'
+                    fill='#0000'/>
+                <circle
+                    v-on:mousedown='mouseDown($event, 3)'
+                    v-on:mouseup='mouseUp'
+                    cursor='ne-resize'
+                    :cx='rect.tx'
+                    :cy='rect.sy'
+                    r='4'
+                    fill='#0000'/>
+                <circle
+                    v-on:mousedown='mouseDown($event, 4)'
+                    v-on:mouseup='mouseUp'
+                    cursor='sw-resize'
+                    :cx='rect.sx'
+                    :cy='rect.ty'
+                    r='4'
+                    fill='#0000'/>
+            </svg>
+            <div id='contextmenu' ref='contextmenu' v-bind:style="{position: 'fixed', visibility: ctxmenu.visibility, left: ctxmenu.x+'px', top: ctxmenu.y+'px'}">
+                <div class="btn-group-vertical">
+                    <button type='button' class="btn btn-primary" @click="type='b'" onclick="onClick('b')">Bird</button>
+                    <button type='button' class="btn btn-primary" @click="type='n'" onclick="onClick('n')">Non Bird</button>
+                    <button type='button' class="btn btn-primary" @click="type='u'" onclick="onClick('u')">Unknown</button>
+                    <button type='button' class="btn btn-primary" @click="type='p'" onclick="onClick('p')">Pass</button>
+                </div>
+                <div class="btn-group-vertical">
+                    <button type='button' class="btn btn-primary" @click="type='1'" onclick="onClick('1')">イヌワシ</button>
+                    <button type='button' class="btn btn-primary" @click="type='2'" onclick="onClick('2')">オジロワシ</button>
+                    <button type='button' class="btn btn-primary" @click="type='3'" onclick="onClick('3')">チュウヒ</button>
+                    <button type='button' class="btn btn-primary" @click="type='4'" onclick="onClick('4')">クマタカ</button>
+                    <button type='button' class="btn btn-primary" @click="type='5'" onclick="onClick('5')">タンチョウ</button>
+                </div>
+            </div>
+            <div id='footer'>
+                <div>
+                    <div class="row mt-2">
+                        <div id='debug' class="col-2">
+                                <span class="h6 font-weight-bold">
+                                    画像右上からの枠の位置
+                                </span><br>
+                                x:{{parseInt(Math.min(rect.sx, rect.tx))}}
+                                y:{{parseInt(Math.min(rect.sy, rect.ty))}}<br>
+                                <br>
+                                <span class="h6 font-weight-bold">
+                                    画像の大きさ
+                                </span><br>
+                                幅:{{parseInt(image.w)}}
+                                高さ:{{parseInt(image.h)}}<br>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <button type="button" class="btn border-default mb-2 mr-2" data-toggle="modal" data-target="#staticBackdrop">
+                                  ボタンの解説
+                                </button>
+                                <input class='btn border-default mb-2 mr-2' type='button' value='1つ前に戻る' onclick="onClickBack()">
+                                <input class='btn border-default mb-2' type='button' value='初期位置に戻る' onclick="onClickInit()" >
+                            </div>
+                            <div class="row">
+                                <input class='h6 btn btn-primary mr-1' type='button' value='イヌワシ( A )' @click="type='1'" onclick="onClick2('1')" onmouseover = "popUp('1');">
+                                <input class='h6 btn btn-primary mr-1' type='button' value='オジロワシ( S )' @click="type='2'" onclick="onClick2('2')">
+                                <input class='h6 btn btn-primary mr-1' type='button' value='チュウヒ( D )' @click="type='3'" onclick="onClick2('3')">
+                                <input class='h6 btn btn-primary mr-1' type='button' value='クマタカ( F )' @click="type='4'" onclick="onClick2('4')">
+                                <input class='h6 btn btn-primary' type='button' value='タンチョウ( G )' @click="type='5'" onclick="onClick2('5')">
+                            </div>
+                            <div class="row">
+                                <input class='btn btn-primary mr-1' type='button' value='Bird( Z )' @click="type='b'" onclick="onClick2('b')">
+                                <input class='btn btn-primary mr-1' type='button' value='Non Bird( X )' @click="type='n'" onclick="onClick2('n')">
+                                <input class='btn btn-primary mr-1' type='button' value='Unknown( C )' @click="type='u'" onclick="onClick2('u')">
+                                <input class='btn btn-primary mr-1' type='button' value='Pass( V )' @click="type='p'" onclick="onClick2('p')">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div> フォルダ名 : {{ currentFileName[0] }}</div>
+                            <div> ファイル名 : {{ currentFileName[1] }}</div>
+                            <div> 次の画像 : {{ currentFileName[2] }}</div>
+                            <div> 終了 : {{DataNum[0]}} --- 全画像数 : {{DataNum[1]}}</div>
+                            <div class="progress mt-2" style="height: 35px;">
+                                <div class="progress-bar" role="progressbar" v-bind:style="{width: progress + '%'}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{progress}}%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `,
+    data: function() {
+        return {
+            mouse: {x: 0, y: 0, on: false, sx: 0, sy: 0, dsx: 0, dsy: 0, dtx: 0, dty: 0, svx: 0, svy: 0, dvx: 0, dvy: 0, type: 0},
+            rect:  {sx: 0, sy: 0, tx: 0, ty: 0},
+            view:  {x: 0, y: 0, w: 1000, h: 1000},
+            image: {w: 1000, h: 1000},
+            svg:   {w: 1000, h: 1000},
+            imagePath: '',
+            type: 'u',
+            userID: 'unknown',
+            progress: 20,
+            currentFileName: '',
+            DataNum: '',
+            ctxmenu: {visibility: 'hidden', x: 0, y: 0},
+        }
+    },
+    computed: {
+        viewBox: function() {
+            return this.view.x + ' ' + this.view.y + ' ' + this.view.w + ' ' + this.view.h;
+        },
+        mousev: function() {
+            return {
+                x: this.view.x + this.mouse.x / this.svg.w * this.view.w,
+                y: this.view.y + this.mouse.y / this.svg.h * this.view.h
+            }
+        },
+    },
+    watch: {
+    },
+    mounted: function() {
+        // var url = new URL(window.location.href);
+        // var imagePath = url.searchParams.get("imagepath");
+        // var rect = url.searchParams.get("rect").split(",");
+        this.svg.w = window.innerWidth;
+        this.svg.h = window.innerHeight;
+    },
+    methods: {
+        loadImage: function(imagePath) {
+            var img = new Image();
+            var hoge = this;
+            img.onload = function() {
+                hoge.imagePath = imagePath;
+                hoge.image.w = this.width;
+                hoge.image.h = this.height;
+                hoge.init();
+            }
+
+            img.src = imagePath;
+
+        },
+        init: function() {
+            var zoom = 12;
+            var x = Math.min(this.rect.sx, this.rect.tx);
+            var y = Math.min(this.rect.sy, this.rect.ty);
+            var w = Math.abs(this.rect.tx - this.rect.sx);
+            var h = Math.abs(this.rect.ty - this.rect.sy);
+            this.view = {
+                x: x + w/2 - this.svg.w/2/zoom,
+                y: y + h/2 - this.svg.h/2/zoom,
+                w: this.svg.w/zoom,
+                h: this.svg.h/zoom,
+            }
+        },
+        wheel: function(event) {
+            var vmx = this.mousev.x;
+            var vmy = this.mousev.y;
+            var zoom = 1.5;
+            if(event.deltaY < 0){
+                zoom = 1.0/zoom;
+            }
+            this.view.x = vmx + (this.view.x - vmx)*zoom;
+            this.view.y = vmy + (this.view.y - vmy)*zoom;
+            this.view.w = this.view.w*zoom;
+            this.view.h = this.view.w*this.svg.h/this.svg.w;
+            this.view.w = this.view.w;
+        },
+        contextMenu: function(event) {
+            event.preventDefault();
+            // console.log("this.mouse",this.mouse)
+            // this.$refs['contextmenu'].style.visibility = 'visible';
+            // this.$refs['contextmenu'].style.left = this.mouse.x;
+            // this.$refs['contextmenu'].style.top = this.mouse.y;
+            this.ctxmenu.visibility = 'visible';
+            this.ctxmenu.x = this.mouse.x;
+            this.ctxmenu.y = this.mouse.y;
+        },
+        click: function(event) {
+            // this.$refs['contextmenu'].style.visibility = 'hidden';
+            this.ctxmenu.visibility = 'hidden';
+        },
+        mouseDown: function(event, type) {
+            if(event.which !== 1) return;
+            this.mouse.on = true;
+            this.mouse.sx = this.mousev.x;
+            this.mouse.sy = this.mousev.y;
+            this.mouse.dsx = this.rect.sx - this.mousev.x;
+            this.mouse.dsy = this.rect.sy - this.mousev.y;
+            this.mouse.dtx = this.rect.tx - this.mousev.x;
+            this.mouse.dty = this.rect.ty - this.mousev.y;
+            this.mouse.svx = this.view.x;
+            this.mouse.svy = this.view.y;
+            this.mouse.dvx = this.mouse.x;
+            this.mouse.dvy = this.mouse.y;
+            this.mouse.type = type;
+        },
+        mouseUp: function(event) {
+            this.mouse.on = false;
+        },
+        mouseMove: function(event) {
+            this.mouse.x = event.clientX - event.currentTarget.getBoundingClientRect().left;
+            this.mouse.y = event.clientY - event.currentTarget.getBoundingClientRect().top;
+            if(this.mouse.on){
+                if(this.mouse.type == -1){
+                    var dvx = (this.mouse.dvx - this.mouse.x)/this.svg.w*this.view.w;
+                    var dvy = (this.mouse.dvy - this.mouse.y)/this.svg.h*this.view.h;
+                    this.view.x = this.mouse.svx + dvx;
+                    this.view.y = this.mouse.svy + dvy;
+                }
+                if(this.mouse.type == 0){
+                    this.rect.sx = parseInt(this.mousev.x + this.mouse.dsx);
+                    this.rect.sy = parseInt(this.mousev.y + this.mouse.dsy);
+                    this.rect.tx = parseInt(this.mousev.x + this.mouse.dtx);
+                    this.rect.ty = parseInt(this.mousev.y + this.mouse.dty);
+                }
+                if(this.mouse.type == 1){
+                    this.rect.sx = parseInt(this.mousev.x + this.mouse.dsx);
+                    this.rect.sy = parseInt(this.mousev.y + this.mouse.dsy);
+                }
+                if(this.mouse.type == 2){
+                    this.rect.tx = parseInt(this.mousev.x + this.mouse.dtx);
+                    this.rect.ty = parseInt(this.mousev.y + this.mouse.dty);
+                }
+                if(this.mouse.type == 3){
+                    this.rect.tx = parseInt(this.mousev.x + this.mouse.dtx);
+                    this.rect.sy = parseInt(this.mousev.y + this.mouse.dsy);
+                }
+                if(this.mouse.type == 4){
+                    this.rect.sx = parseInt(this.mousev.x + this.mouse.dsx);
+                    this.rect.ty = parseInt(this.mousev.y + this.mouse.dty);
+                }
+                if(this.mouse.type == 5){
+                    this.rect.sy = parseInt(this.mousev.y + this.mouse.dsy);
+                }
+                if(this.mouse.type == 6){
+                    this.rect.tx = parseInt(this.mousev.x + this.mouse.dtx);
+                }
+                if(this.mouse.type == 7){
+                    this.rect.ty = parseInt(this.mousev.y + this.mouse.dty);
+                }
+                if(this.mouse.type == 8){
+                    this.rect.sx = parseInt(this.mousev.x + this.mouse.dsx);
+                }
+            }
+        },
+    },
+});
+let app = new Vue({
+    el: "#vue-wrap",
+    methods: {
+        setImagePath: function(imagePath) {
+            this.$refs.main.loadImage(imagePath);
+        },
+        getRect: function(imagePath) {
+            var sx = this.$refs.main.rect.sx;
+            var sy = this.$refs.main.rect.sy;
+            var tx = this.$refs.main.rect.tx;
+            var ty = this.$refs.main.rect.ty;
+            return [Math.min(sx, tx), Math.min(sy, ty), Math.abs(sx-tx), Math.abs(sy-ty)];
+        },
+        setRect: function(x, y, w, h) {
+            this.$refs.main.rect.sx = x;
+            this.$refs.main.rect.sy = y;
+            this.$refs.main.rect.tx = x+w;
+            this.$refs.main.rect.ty = y+h;
+            this.$refs.main.init();
+        },
+        getType: function() {
+            return this.$refs.main.type;
+        },
+        setUserName: function(name) {
+            this.$refs.main.userID = name;
+        },
+        setFileName: function(filename) {
+            this.$refs.main.currentFileName = filename;
+        },
+        setDataNum: function(DataNum) {
+            this.$refs.main.DataNum = DataNum;
+        },
+        setProgress: function(progress) {
+            // this.$refs.main.rect.userID = progress;
+            this.$refs.main.progress = progress;
+        },
+    },
+});
+
+
+function execPost(action, data) {
+ // フォームの生成
+ var form = document.createElement("form");
+ form.setAttribute("action", action);
+ form.setAttribute("method", "post");
+ form.style.display = "none";
+ document.body.appendChild(form);
+ // パラメタの設定
+ if (data !== undefined) {
+  for (var paramName in data) {
+   var input = document.createElement('input');
+   input.setAttribute('type', 'hidden');
+   input.setAttribute('name', paramName);
+   input.setAttribute('value', data[paramName]);
+   form.appendChild(input);
+  }
+ }
+ // submit
+ form.submit();
+}
+
+function backPicture(action, data) {
+ // フォームの生成
+ var form = document.createElement("form");
+ form.setAttribute("action", action);
+ form.setAttribute("method", "post");
+ form.style.display = "none";
+ document.body.appendChild(form);
+ // パラメタの設定
+ if (data !== undefined) {
+  for (var paramName in data) {
+   var input = document.createElement('input');
+   input.setAttribute('type', 'hidden');
+   input.setAttribute('name', paramName);
+   input.setAttribute('value', data[paramName]);
+   form.appendChild(input);
+  }
+ }
+ // submit
+ form.submit();
+}
+
+//アノテーションID
+var id = <%= @user_state[0] %>;
+var userId = <%= @user_state[1] %>;
+//ローカルの場合
+// var path = '/assets/'+;
+var path = `<%= @user_state[2] %>`;
+var info = [<%= @user_state[3][0..-3] %>];
+
+// console.log("id", id);
+var folder = `<%= @user_state[4]%>`;
+var file = `<%= @user_state[5]%>`;
+var next = `<%= @user_state[6]%>`;
+var fileData = [folder, file, next];
+var finish = `<%= @number[0]%>`;
+var unfinish = `<%= @number[1]%>`;
+var data_num = [finish, unfinish];
+var folder_file = folder+"/"+file
+
+app.setImagePath(path);
+app.setRect(info[0],info[1],info[2], info[3]);
+app.setUserName('None');
+app.setProgress(<%= @progress[1]%>);
+app.setFileName(fileData);
+app.setDataNum(data_num);
+
+//キーボードを押した時の動作
+document.addEventListener('keydown', function(e) {
+    console.log(e.code);
+    var type = "";
+    switch(e.code){
+    case 'KeyZ':
+        type = 'b';
+        break;
+    case 'KeyX':
+        type = 'n';
+        break;
+    case 'KeyC':
+        type = 'u';
+        break;
+    case 'KeyV':
+        type = 'p';
+        break;
+    case 'KeyA':
+        type = '1';
+        break;
+    case 'KeyS':
+        type = '2';
+        break;
+    case 'KeyD':
+        type = '3';
+        break;
+    case 'KeyF':
+        type = '4';
+        break;
+    case 'KeyG':
+        type = '5';
+        break;
+    default :
+        return;
+    }
+
+    app.$refs.main.type = type;
+
+    // console.log("app.$refs.main.type", app.$refs.main.type);
+    if(app.$refs.main.type!='p'){
+        var pos = app.getRect(path);
+    }else{
+        var pos = info;
+    }
+
+    var results = {id: id, user_id: userId, path: folder_file, position: pos, category: app.$refs.main.type};
+    // post_xhr_request('action',results)
+    // postData(results);
+    execPost("action", results)
+});
+
+//マウスボタンを押したときの動作
+function onClick(type) {
+
+    if(type!='p'){
+        var pos = app.getRect(path);
+    }else{
+        var pos = info;
+    }
+
+    // var pos = app.getRect(path);
+    var results = {id: id, user_id: userId, path: folder_file, position: pos, category: type};
+    // console.log("results", results);
+    // postData(results);
+    execPost("action", results)
+}
+
+//ボタンを押したときの動作
+function onClick2(type) {
+
+    if(type!='p'){
+        var pos = app.getRect(path);
+    }else{
+        var pos = info;
+    }
+
+    var results = {id: id, user_id: userId, path: folder_file, position: pos, category: type};
+    // console.log("results", results);
+    // postData(results);
+    execPost("action", results)
+}
+
+//バックボタンを押したときの挙動
+function onClickBack(){
+    var results = {user_id: userId, annotation_id: id};
+    backPicture("back", results);
+}
+
+//initボタンを押した時の挙動
+function onClickInit(){
+    app.setRect(info[0],info[1],info[2], info[3]);
+}
+
+
+</script>
+
+<% else %>
+
+    <div id='footer'>
+            <div class="mt-2 ml-2">
+              <p class="text-default h5 mb-3">割り当てられている画像はありません</p>
+            </div>
+    </div>
+<% end %>
+
+<!-- <input class='btn border-default mb-2' type='button' value='初期位置に戻る' @click="init" > -->
+
+
+

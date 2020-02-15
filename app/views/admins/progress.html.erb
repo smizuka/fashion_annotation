@@ -1,0 +1,56 @@
+<div class="container">
+    <div class="mt-3">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" href="./main">割り当て</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="./progress">作業進捗</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./preprocess">ユーザー管理</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content">
+<!--    <div class="tab-pane active" id="allocation">
+   </div>
+   <div class="tab-pane" id="progress"> -->
+      <div class="row">
+        <div class="col-10 offset-1">
+          <%= link_to("すべての結果を出力", admins_post_path(format: :csv), {class: "btn btn-primary mt-3"}) %>
+          <%= link_to("結果の平均を出力", admins_avg_path(format: :csv), {class: "btn btn-primary mt-3"}) %>
+        </div>
+      </div>
+      <% @progress.each_with_index do |pro, i| %>
+      <div class="row">
+        <div class=" col-10 offset-1 card mt-3">
+            <p class="mt-3">
+              作業者名 : <%= pro[0] %>
+            </p>
+<!--             <p>
+              <a class="btn border-primary mt-3" data-toggle="collapse" href="#collapseExample<%= i%>" role="button" aria-expanded="false" aria-controls="collapseExample<%= i%>">
+                作業者名 : <%#= pro[0] %>
+              </a>
+            </p>
+            <div class="collapse" id="collapseExample<%= i%>">
+              <div class="card card-body">
+                <p>ID: <%#= pro[1] %> </p>
+                <p>区分: <%#= pro[2] %> </p>
+              </div>
+            </div> -->
+
+            <% pro[3].each do |v| %>
+              <p>フォルダ名：<%= v[0]%> (<%= v[2]%>枚 :<%= v[3]%>枚中) </p>
+              <div class="progress mb-3" style="height: 40px;">
+                <div class="progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width:<%= v[1]%>%;"><%= v[1]%>%</div>
+              </div>
+            <% end %>
+        </div>
+      </div>
+      <% end %>
+</div>
+

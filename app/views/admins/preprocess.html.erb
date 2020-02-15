@@ -1,0 +1,64 @@
+<div class="container">
+    <div class="mt-3">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" href="./main">割り当て</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./progress">作業進捗</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="./preprocess">ユーザー管理</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content">
+<!--    <div class="tab-pane active" id="allocation">
+   </div>
+   <div class="tab-pane" id="progress">
+   </div>
+   <div class="tab-pane" id="preprocess"> -->
+      <div class="row">
+        <div class="col-10 offset-1 mt-5">
+        <table class="table table-striped">
+          <tr class="thead-dark">
+            <th class="text-left">ユーザー名</th>
+            <th class="text-left">ユーザーID</th>
+            <th class="text-left">区分</th>
+            <th class="text-center"></th>
+          </tr>
+          <% @users.each do |user| %>
+          <tr>
+            <td class="h5 text-left">作業者ID : <%= user[:name] %></td>
+            <td class="h5 text-left"> <%= user[:login_id] %></td>
+            <td class="h5 text-left"> <%= user[:type] %></td>
+            <% if user[:display_id] == "display" %>
+              <td class="h5 text-center">
+                <%= link_to admins_hidden_path(user[:id]),method: :post do%>
+                  <span class="btn btn-primary">非表示</span>
+                <%end%>
+              </td>
+            <% else %>
+              <td class="h5 text-center">
+                <%= link_to admins_display_path(user[:id]),method: :post do%>
+                  <span class="btn border-primary">再表示</span>
+                <%end%>
+              </td>
+            <% end %>
+          </tr>
+          <% end %>
+        </table>
+        </div>
+      </div>
+<!--    </div> -->
+</div>
+
+
+
+
+
+
+

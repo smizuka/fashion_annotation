@@ -1,0 +1,16 @@
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/binding_of_caller-0.8.0/ext/binding_of_caller
+/Users/mizukamisatoru/.rbenv/versions/2.4.1/bin/ruby -r ./siteconf20200215-62099-1epw0zv.rb extconf.rb
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/binding_of_caller-0.8.0/ext/binding_of_caller
+make "DESTDIR=" clean
+make: *** No rule to make target `clean'.  Stop.
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/binding_of_caller-0.8.0/ext/binding_of_caller
+make "DESTDIR="
+echo "Nada."
+Nada.
+
+current directory: /Users/mizukamisatoru/Desktop/techboost/fashion_annotation/vendor/bundle/gems/binding_of_caller-0.8.0/ext/binding_of_caller
+make "DESTDIR=" install
+echo "Nada."
+Nada.

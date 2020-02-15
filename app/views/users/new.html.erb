@@ -1,0 +1,75 @@
+<div class="row">
+  <div class="offset-4 col-4 mt-5">
+    <%= form_for @user do |f| %>
+      <!-- 名前の入力フォーム -->
+      <div class="form-group">
+        <%= f.label :name, class: "text-primary" %>
+        <%= f.text_field :name, class: "form-control"%>
+        <!-- エラーメッセージ -->
+        <% if @user.errors.any? %>
+          <% @user.errors.full_messages_for(:name).each do |message| %>
+            <p class="text-white"><%= message %></p>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- 名前の入力フォーム -->
+      <div class="form-group">
+        <%= f.label :ID, class: "text-primary" %>
+        <%= f.text_field :login_id, class: "form-control"%>
+        <!-- エラーメッセージ -->
+        <% if @user.errors.any? %>
+          <% @user.errors.full_messages_for(:login_id).each do |message| %>
+            <p class="text-white"><%= message %></p>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- パスワードの入力フォーム -->
+      <div class="form-group">
+        <%= f.label :password, class: "text-primary"%>
+        <%= f.text_field :password, class: "form-control" %>
+        <!-- エラーメッセージ -->
+        <% if @user.errors.any? %>
+          <% @user.errors.full_messages_for(:password).each do |message| %>
+            <p class="text-primary"><%= message %></p>
+          <% end %>
+        <% end %>
+      </div>
+      <!-- パスワードの確認フォーム -->
+      <div class="form-group">
+        <%= f.label :password_confirmation, class: "text-primary"%>
+        <%= f.text_field :password_confirmation, class: "form-control" %>
+        <!-- エラーメッセージ -->
+        <% if @user.errors.any? %>
+          <% @user.errors.full_messages_for(:password_confirmation).each do |message| %>
+            <p class="text-primary"><%= message %></p>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="row mb-3 mt-3">
+        <div class="col-4 offset-1">
+<!--           <span>社内の作業員</span> -->
+          <%= f.radio_button :user_type, :inhouse %>
+          <%= f.label :社内の作業員, class: "job_type_label" %>
+        </div>
+        <div class="col-4 offset-2">
+<!--           <span>社外の作業員</span> -->
+          <%= f.radio_button :user_type, :outside %>
+          <%= f.label :社外の作業員, class: "job_type_label" %>
+        </div>
+      </div>
+      <div class="row">
+         <div class="col-4 offset-4">
+            <%= f.submit "登録", class: "btn btn-block btn-primary"%>
+         </div>
+      </div>
+      <div class="row">
+          <div class="mx-auto mt-3">
+            <a class="text-primary" href="/">ログインに戻る</a>
+          </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+

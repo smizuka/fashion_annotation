@@ -1,0 +1,30 @@
+<div class="row">
+    <div class="col-10 offset-1">
+        <div class="row">
+            <div class="col-4 offset-4 mt-5">
+<!--                 <p class="text-center">ログイン</p> -->
+                <%= form_for :session, url: sessions_create_path do |f| %>
+                    <div class="form-group">
+                      <%= f.label :"ID", class: 'text-primary' %>
+                      <%= f.text_field :login_id, class: 'form-control' %>
+                    </div>
+                    <div class="form-group">
+                      <%= f.label :password, class: 'text-primary' %>
+                      <%= f.password_field :password, class: 'form-control' %>
+                    </div>
+                    <div class="row">
+                      <div class="col-4 mx-auto mt-3">
+                          <%= f.submit 'ログイン', class: 'btn btn-primary' %>
+                      </div>
+                    </div>
+                <% end %>
+                    <div class="row">
+                      <div class="mx-auto mt-3">
+                          <%= link_to("新規登録はこちら", new_user_path, {class: "text-primary"}) %>
+                      </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
